@@ -1,0 +1,75 @@
+
+#[smart_beaver::extension(dependencies = ["ownable"])]
+pub mod psp22_pausable_extension {
+    use crate::traits::PSP22Mintable;
+    use crate::traits::PSP22Pausable;
+
+    #[smart_beaver::storage]
+    pub struct Token {
+        is_paused: bool,
+    }
+
+    impl PSP22Pausable for Token {
+        #[ink(message)]
+        fn pause(&mut self) -> Result<(), PSP22Error> {
+            assert_eq!(Some(self.env().caller()), self.owner, "Only owner can pause");
+            self.is_paused = true;
+            Ok(())
+        }
+
+        #[ink(message)]
+        fn unpause(&mut self) -> Result<(), PSP22Error> {
+            assert_eq!(Some(self.env().caller()), self.owner, "Only owner can unpause");
+            self.is_paused = false;
+            Ok(())
+        }
+    }
+
+    impl PSP22Mintable for Token {
+        #[ink(message)]
+        #[smart_beaver::append(line = 0)]
+        fn mint(&mut self, account: AccountId, amount: Balance) -> Result<(), PSP22Error> {
+            assert!(!self.is_paused, "Token is paused");
+        }
+    }
+
+    impl PSP22Burnable for Token {
+        #[ink(message)]
+        #[smart_beaver::append(line = 0)]
+        fn burn(&mut self, amount: u128) -> Result<(), PSP22Error> {
+            assert!(!self.is_paused, "Token is paused");
+        }
+
+        #[smart_beaver::append(line = 0)]
+        #[ink(message)]
+        fn burn_from(&mut self, account: AccountId, amount: u128) -> Result<(), PSP22Error> {
+            assert!(!self.is_paused, "Token is paused");
+        }
+    }
+
+    impl PSP22 for Token {
+
+        #[ink(message)]
+        #[smart_beaver::append(line = 0)]
+        fn transfer(
+            &mut self,
+            to: AccountId,
+            value: u128,
+            _data: Vec<u8>,
+        ) -> Result<(), PSP22Error> {
+            assert!(!self.is_paused, "Token is paused");
+        }
+
+        #[ink(message)]
+        #[smart_beaver::append(line = 0)]
+        fn transfer_from(
+            &mut self,
+            from: AccountId,
+            to: AccountId,
+            value: u128,
+            _data: Vec<u8>,
+        ) -> Result<(), PSP22Error> {
+            assert!(!self.is_paused, "Token is paused");
+        }
+    }
+}

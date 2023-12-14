@@ -1,0 +1,32 @@
+#[smart_beaver::extension]
+pub mod psp22_wrapper_extension {
+    use crate::traits::PSP22Wrapper;
+
+    #[smart_beaver::storage]
+    pub struct Token {
+        pub underlying: Option<AccountId>,
+    }
+
+    impl PSP22Wrapper for Token {
+        #[ink(message)]
+        fn deposit_for(&mut self, account: AccountId, amount: u128) -> Result<(), PSP22Error> {
+            assert!(self.underlying.is_some(), "No underlying contract");
+            let underlying = self.underlying.unwrap();
+            assert_ne!(underlying, account, "Cannot deposit to underlying contract");
+            self.data.deposit(underlying, self.env().caller(), self.env().account_id(), amount)?;
+            let events = self.data.mint(account, amount)?;
+            self.emit_events(events);
+            Ok(())
+        }
+
+        #[ink(message)]
+        fn withdraw_to(&mut self, account: AccountId, amount: u128) -> Result<(), PSP22Error> {
+            assert!(self.underlying.is_some(), "No underlying contract");
+            let underlying = self.underlying.unwrap();
+            assert_ne!(underlying, account, "Cannot withdraw from underlying contract");
+            let events = self.data.burn(self.env().caller(), amount)?;
+            self.emit_events(events);
+            self.data.withdraw(underlying, account, amount)
+        }
+    }
+}

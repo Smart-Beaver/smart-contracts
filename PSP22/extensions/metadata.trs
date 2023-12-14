@@ -1,0 +1,28 @@
+#[smart_beaver::extension]
+pub mod psp22_metadata_extension {
+    use crate::traits::PSP22Metadata;
+    #[smart_beaver::storage]
+    pub struct Token {
+        pub name: Option<String>,
+        pub symbol: Option<String>,
+        pub decimals: u8,
+    }
+
+    impl PSP22Metadata for Token {
+        #[ink(message)]
+        fn token_name(&self) -> Option<String> {
+            self.name.clone()
+        }
+        #[ink(message)]
+        fn token_symbol(&self) -> Option<String> {
+            self.symbol.clone()
+        }
+        #[ink(message)]
+        fn token_decimals(&self) -> u8 {
+            self.decimals
+        }
+    }
+}
+
+
+
