@@ -1,0 +1,17 @@
+#[smart_beaver::extension(dependencies = ["mintable"])]
+pub mod psp22_capped_extension {
+    use crate::traits::PSP22Mintable;
+
+    #[smart_beaver::storage]
+    pub struct Token {
+        cap: u128,
+    }
+
+    impl PSP22Mintable for Token {
+        #[ink(message)]
+        #[smart_beaver::append(line = 1)]
+        fn mint(&mut self, amount: u128) -> Result<(), PSP22Error> {
+            assert!(self.cap >= self.total_supply() + amount, "Max cap exceeded");
+        }
+    }
+}

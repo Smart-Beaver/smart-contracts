@@ -1,0 +1,32 @@
+[package]
+name = "psp22"
+version = "0.3.0"
+authors = [
+    "Hans <michal.handzlik@cardinals.cc>",
+    "Jasuwienas <mariusz.jasuwienas@blockydevs.com>",
+    "Maciek Malik <poczta@maciekmalik.pl>",
+    "BlockyDevs <contact@blockydevs.com>"
+]
+edition = "2021"
+
+[dependencies]
+ink = { version = "4.3.0", default-features = false }
+scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
+scale-info = { version = "2.9", default-features = false, features = ["derive"], optional = true }
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = ["std"]
+std = [
+    "ink/std",
+    "scale/std",
+    "scale-info/std",
+]
+contract = []
+ink-as-dependency = []
+
+[[test]]
+name = "unit_tests"
+path = "tests/unit.rs"

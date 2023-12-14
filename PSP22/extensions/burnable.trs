@@ -1,0 +1,20 @@
+#[smart_beaver::extension]
+pub mod psp22_burnable_extension {
+    use crate::traits::PSP22Burnable;
+
+    impl PSP22Burnable for Token {
+        #[ink(message)]
+        fn burn(&mut self, amount: u128) -> Result<(), PSP22Error> {
+            let events = self.data.burn(self.env().caller(), amount)?;
+            self.emit_events(events);
+            Ok(())
+        }
+
+        #[ink(message)]
+        fn burn_from(&mut self, account: AccountId, amount: u128) -> Result<(), PSP22Error> {
+            let events = self.data.burn_from(self.env().caller(), account, amount)?;
+            self.emit_events(events);
+            Ok(())
+        }
+    }
+}
