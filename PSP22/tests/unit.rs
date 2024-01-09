@@ -1,5 +1,5 @@
-use psp22::token::*;
-use psp22::PSP22;
+use psp22_full::token::*;
+use psp22_full::PSP22;
 
 #[cfg(test)]
 mod tests {

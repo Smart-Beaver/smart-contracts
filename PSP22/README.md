@@ -1,8 +1,21 @@
+Implementation of PSP22 token standard in pure ink!
+Contains following extensions traits:
+* Metadata
+* Burnable
+* Mintable
+* Pausable
+* Wrapper
+* Ownable
+
 ## Build
 
 https://github.com/paritytech/cargo-contract
 
 cargo contract build --release --features "contract"
+
+## Unit tests
+
+cargo test --features "contract"
 
 ## About
 
