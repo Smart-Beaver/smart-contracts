@@ -1,5 +1,5 @@
 [package]
-name = "psp22"
+name = "psp22-full"
 version = "0.3.0"
 authors = [
     "Hans <michal.handzlik@cardinals.cc>",
@@ -7,7 +7,13 @@ authors = [
     "Maciek Malik <poczta@maciekmalik.pl>",
     "BlockyDevs <contact@blockydevs.com>"
 ]
+description = "Implementation of PSP22 token standard in pure ink!"
+license-file = "LICENSE"
 edition = "2021"
+homepage = "https://github.com/Smart-Beaver"
+repository = "https://github.com/Smart-Beaver/smart-contracts/tree/main/PSP22"
+license = "Apache-2.0"
+readme = "README.md"
 
 [dependencies]
 ink = { version = "4.3.0", default-features = false }

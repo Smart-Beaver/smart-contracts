@@ -1,8 +1,10 @@
 //! Main module for the PSP22 token implementation.
 //!
 //! This module defines the main `Token` struct and re-exports key components from other modules.
-
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
+
+
+
 pub mod data;
 pub mod errors;
 pub mod traits;
@@ -10,15 +12,16 @@ pub mod traits;
 pub use data::{PSP22Data, PSP22Event};
 pub use errors::PSP22Error;
 pub use traits::PSP22;
-pub use self::token::Token;
 
 /// PSP22 token implementation.
 ///
 /// This struct represents a PSP22 compliant fungible token.
+#[cfg(feature = "contract")]
 #[ink::contract]
 pub mod token {
-    use crate::{PSP22Data, PSP22Error, PSP22Event, PSP22};
     use ink::prelude::vec::Vec;
+
+    use crate::{PSP22, PSP22Data, PSP22Error, PSP22Event};
 
     #[ink(storage)]
     pub struct Token {
@@ -68,6 +71,7 @@ pub mod token {
             }
         }
     }
+
     #[ink(event)]
     pub struct Approval {
         #[ink(topic)]
@@ -76,6 +80,7 @@ pub mod token {
         spender: AccountId,
         amount: u128,
     }
+
     #[ink(event)]
     pub struct Transfer {
         #[ink(topic)]
@@ -84,6 +89,7 @@ pub mod token {
         to: Option<AccountId>,
         value: u128,
     }
+
     impl PSP22 for Token {
         /// Returns the total supply of tokens.
         ///
