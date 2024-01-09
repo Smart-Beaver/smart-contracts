@@ -3,3 +3,5 @@
 **/target/**
 
 PSP22/extensions/tests/*/src/*
+
+.DS_Store
