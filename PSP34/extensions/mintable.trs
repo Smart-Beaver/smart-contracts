@@ -1,0 +1,18 @@
+#[smart_beaver::extension(dependencies = ["ownable"])]
+pub mod psp34_mintable_extension {
+    use crate::traits::PSP34Mintable;
+    use crate::errors::OwnableError;
+
+    impl PSP34Mintable for Token {
+        #[ink(message)]
+        fn mint(&mut self, id: Id) -> Result<(), PSP34Error> {
+            let caller = self.env().caller();
+            if self.owner != Some(caller) {
+                return Err(PSP34Error::Custom(OwnableError::NotAnOwner.to_string()));
+            }
+            let events = self.data.mint(caller, id)?;
+            self.emit_events(events);
+            Ok(())
+        }
+    }
+}

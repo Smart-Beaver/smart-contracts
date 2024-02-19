@@ -1,0 +1,13 @@
+#[smart_beaver::extension]
+pub mod psp34_burnable_extension {
+    use crate::traits::PSP34Burnable;
+
+    impl PSP34Burnable for Token {
+        #[ink(message)]
+        fn burn(&mut self, account: AccountId, id: Id) -> Result<(), PSP34Error> {
+            let events = self.data.burn(self.env().caller(), account, id)?;
+            self.emit_events(events);
+            Ok(())
+        }
+    }
+}

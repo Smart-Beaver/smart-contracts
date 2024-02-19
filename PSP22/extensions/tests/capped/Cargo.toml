@@ -18,7 +18,7 @@ scale-info = { version = "2.9", default-features = false, features = ["derive"],
 path = "src/lib.rs"
 
 [features]
-default = ["std"]
+default = ["std", "contract"]
 std = [
     "ink/std",
     "scale/std",

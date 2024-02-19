@@ -1,10 +1,11 @@
-use psp22_burnable_tests::token::*;
-use psp22_burnable_tests::PSP22;
-use psp22_burnable_tests::traits::PSP22Burnable;
+
 #[cfg(test)]
 mod tests {
     use ink::primitives::AccountId;
     use ink::env::{DefaultEnvironment, test::set_caller};
+    use psp22_burnable_tests::PSP22;
+    use psp22_burnable_tests::token::Token;
+    use psp22_burnable_tests::traits::PSP22Burnable;
     use super::*;
 
     #[ink::test]
@@ -81,9 +82,10 @@ mod tests {
         let third_party = AccountId::from([0x3; 32]);
         set_caller::<DefaultEnvironment>(owner);
         let mut token = Token::new(2);
+
         token.approve(sender, 2).expect("Success expected");
         token.transfer(third_party, 1, Vec::from([])).expect("Success expected");
-        set_caller::<DefaultEnvironment>(sender);
+
         assert_eq!(token.total_supply(), 2);
         assert!(token.burn_from(owner, 2).is_err());
         assert_eq!(token.total_supply(), 2);

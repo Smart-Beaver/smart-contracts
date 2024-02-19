@@ -1,40 +1,30 @@
-#![cfg_attr(not(feature = "std"), no_std, no_main)]
 
+#![cfg_attr(not(feature = "std"), no_std, no_main)]
 pub use data::{Id, PSP34Data, PSP34Event};
 pub use errors::PSP34Error;
 pub use traits::{PSP34, PSP34Burnable, PSP34Enumerable, PSP34Metadata, PSP34Mintable};
-
 mod data;
 mod errors;
 mod traits;
 mod unit_tests;
 mod test_utils;
 
-// An example code of a smart contract using PSP34Data struct to implement
-// the functionality of PSP34 fungible token.
-//
-// Any contract can be easily enriched to act as PSP34 token by:
-// (1) adding PSP34Data to contract storage
-// (2) properly initializing it
-// (3) defining the correct AttributeSet, Transfer and Approval events
-// (4) implementing PSP34 trait based on PSP34Data methods
-// (5) properly emitting resulting events
-//
-// Implemented the optional PSP34Mintable (6), PSP34Burnable (7), and PSP34Metadata (8) extensions
-// and included unit tests (8).
-
 #[cfg(feature = "contract")]
 #[ink::contract]
 pub mod token {
+    use crate::traits::PSP34Mintable;
+    use crate::errors::OwnableError;
+    use crate::traits::Ownable;
+    use crate::traits::PSP34Burnable;
     use ink::prelude::string::ToString;
     use ink::prelude::vec::Vec;
-
     use crate::{Id, PSP34, PSP34Data, PSP34Error, PSP34Event};
     use crate::data::Data;
 
     #[ink(storage)]
     pub struct Token {
         pub data: PSP34Data,
+        pub owner: Option<AccountId>,
     }
 
     impl Token {
@@ -42,26 +32,22 @@ pub mod token {
         pub fn new() -> Self {
             Self {
                 data: PSP34Data::new(),
+                owner: Some(Self::env().caller()),
             }
         }
 
-        // A helper function translating a vector of PSP34Events into the proper
-        // ink event types (defined internally in this contract) and emitting them.
-        // (5)
         fn emit_events(&self, events: ink::prelude::vec::Vec<PSP34Event>) {
             for event in events {
                 match event {
-                    PSP34Event::Approval {
-                        owner,
-                        operator,
-                        id,
-                        approved,
-                    } => self.env().emit_event(Approval {
-                        owner,
-                        operator,
-                        id,
-                        approved,
-                    }),
+                    PSP34Event::Approval { owner, operator, id, approved } => {
+                        self.env()
+                            .emit_event(Approval {
+                                owner,
+                                operator,
+                                id,
+                                approved,
+                            })
+                    }
                     PSP34Event::Transfer { from, to, id } => {
                         self.env().emit_event(Transfer { from, to, id })
                     }
@@ -73,7 +59,6 @@ pub mod token {
         }
     }
 
-    // (3)
     #[ink(event)]
     pub struct Approval {
         #[ink(topic)]
@@ -85,7 +70,6 @@ pub mod token {
         approved: bool,
     }
 
-    // (3)
     #[ink(event)]
     pub struct Transfer {
         #[ink(topic)]
@@ -96,7 +80,6 @@ pub mod token {
         id: Id,
     }
 
-    // (3)
     #[ink(event)]
     pub struct AttributeSet {
         id: Id,
@@ -104,7 +87,6 @@ pub mod token {
         data: Vec<u8>,
     }
 
-    // (4)
     impl PSP34 for Token {
         #[ink(message)]
         fn collection_id(&self) -> Id {
@@ -122,7 +104,12 @@ pub mod token {
         }
 
         #[ink(message)]
-        fn allowance(&self, owner: AccountId, operator: AccountId, id: Option<Id>) -> bool {
+        fn allowance(
+            &self,
+            owner: AccountId,
+            operator: AccountId,
+            id: Option<Id>,
+        ) -> bool {
             self.data.allowance(owner, operator, id.as_ref())
         }
 
@@ -145,9 +132,7 @@ pub mod token {
             id: Option<Id>,
             approved: bool,
         ) -> Result<(), PSP34Error> {
-            let events = self
-                .data
-                .approve(self.env().caller(), operator, id, approved)?;
+            let events = self.data.approve(self.env().caller(), operator, id, approved)?;
             self.emit_events(events);
             Ok(())
         }
@@ -155,6 +140,58 @@ pub mod token {
         #[ink(message)]
         fn owner_of(&self, id: Id) -> Option<AccountId> {
             self.data.owner_of(&id)
+        }
+    }
+
+    impl PSP34Burnable for Token {
+        #[ink(message)]
+        fn burn(&mut self, account: AccountId, id: Id) -> Result<(), PSP34Error> {
+            let events = self.data.burn(self.env().caller(), account, id)?;
+            self.emit_events(events);
+            Ok(())
+        }
+    }
+
+    impl Ownable for Token {
+        #[ink(message)]
+        fn owner(&self) -> Option<AccountId> {
+            self.owner
+        }
+
+        #[ink(message)]
+        fn renounce_ownership(&mut self) -> Result<(), OwnableError> {
+            assert_eq!(
+                Some(self.env().caller()), self.owner,
+                "Only owner can renounce ownership"
+            );
+            self.owner = None;
+            Ok(())
+        }
+
+        #[ink(message)]
+        fn transfer_ownership(
+            &mut self,
+            new_owner: Option<AccountId>,
+        ) -> Result<(), OwnableError> {
+            assert_eq!(
+                Some(self.env().caller()), self.owner,
+                "Only owner can transfer ownership"
+            );
+            self.owner = new_owner;
+            Ok(())
+        }
+    }
+
+    impl PSP34Mintable for Token {
+        #[ink(message)]
+        fn mint(&mut self, id: Id) -> Result<(), PSP34Error> {
+            let caller = self.env().caller();
+            if self.owner != Some(caller) {
+                return Err(PSP34Error::Custom(OwnableError::NotAnOwner.to_string()));
+            }
+            let events = self.data.mint(caller, id)?;
+            self.emit_events(events);
+            Ok(())
         }
     }
 }

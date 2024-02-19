@@ -1,9 +1,7 @@
 [package]
-name = "psp22_pausable_tests"
+name = "psp34_burnable_tests"
 version = "0.3.0"
 authors = [
-    "Hans <michal.handzlik@cardinals.cc>",
-    "Jasuwienas <mariusz.jasuwienas@blockydevs.com>",
     "Maciek Malik <poczta@maciekmalik.pl>",
     "BlockyDevs Team contact@blockydevs.com"
 ]

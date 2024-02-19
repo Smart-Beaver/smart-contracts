@@ -1,0 +1,32 @@
+#[smart_beaver::extension]
+pub mod ownable_extension {
+    use crate::traits::Ownable;
+    use crate::errors::OwnableError;
+
+    #[smart_beaver::storage]
+    pub struct Token {
+        #[smart_beaver::init(Some(Self::env().caller()))]
+        pub owner: Option<AccountId>,
+    }
+
+    impl Ownable for Token {
+        #[ink(message)]
+        fn owner(&self) -> Option<AccountId> {
+            self.owner
+        }
+
+        #[ink(message)]
+        fn renounce_ownership(&mut self) -> Result<(), OwnableError> {
+            assert_eq!(Some(self.env().caller()), self.owner, "Only owner can renounce ownership");
+            self.owner = None;
+            Ok(())
+        }
+
+        #[ink(message)]
+        fn transfer_ownership(&mut self, new_owner: Option<AccountId>) -> Result<(), OwnableError> {
+            assert_eq!(Some(self.env().caller()), self.owner, "Only owner can transfer ownership");
+            self.owner = new_owner;
+            Ok(())
+        }
+    }
+}
