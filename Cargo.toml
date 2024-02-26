@@ -1,0 +1,20 @@
+[workspace]
+resolver = "2"
+members = [
+    "PSP34",
+    "PSP22",
+    "PSP22/extensions/tests/burnable",
+    "PSP22/extensions/tests/capped",
+    "PSP22/extensions/tests/mintable",
+    "PSP22/extensions/tests/pausable",
+    "PSP22/extensions/tests/wrapper",
+    "PSP34/extensions/tests/burnable",
+    "PSP34/extensions/tests/mintable",
+    "PSP34/extensions/tests/metadata",
+    "PSP34/extensions/tests/enumerable",
+]
+
+[workspace.package]
+edition = "2021"
+authors = ["Maciek Malik <poczta@maciekmalik.pl>", "BlockyDevs <contact@blockydevs.com>"]
+

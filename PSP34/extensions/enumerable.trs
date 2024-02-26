@@ -1,0 +1,17 @@
+#[smart_beaver::extension]
+pub mod psp34_enumerable_extension {
+    use crate::traits::PSP34Enumerable;
+
+    impl PSP34Enumerable for Token {
+        #[ink(message)]
+        fn owners_token_by_index(&self, owner: AccountId, index: u128) -> Result<Id, PSP34Error> {
+            self.data.owners_token_by_index(owner, index)
+        }
+
+        #[ink(message)]
+        fn token_by_index(&self, index: u128) -> Result<Id, PSP34Error> {
+            self.data.token_by_index(index)
+        }
+    }
+
+}

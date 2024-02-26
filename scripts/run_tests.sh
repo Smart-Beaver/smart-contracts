@@ -1,0 +1,1 @@
+cargo test --features "contract","test-only"

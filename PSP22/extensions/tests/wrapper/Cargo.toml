@@ -21,7 +21,7 @@ ink_e2e = { version = "4.3" }
 path = "src/lib.rs"
 
 [features]
-default = ["std"]
+default = ["std", "contract"]
 std = [
     "ink/std",
     "scale/std",
@@ -29,6 +29,8 @@ std = [
 ]
 contract = []
 ink-as-dependency = []
+
+# @FIXME e2e tests break workspace build
 e2e-tests = []
 
 [[test]]

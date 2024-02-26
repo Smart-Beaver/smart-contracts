@@ -1,6 +1,9 @@
 #[smart_beaver::extension]
 pub mod psp22_metadata_extension {
+
+    use ink::prelude::string::String;
     use crate::traits::PSP22Metadata;
+
     #[smart_beaver::storage]
     pub struct Token {
         pub name: Option<String>,
